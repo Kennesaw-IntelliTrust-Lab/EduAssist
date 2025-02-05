@@ -4,10 +4,12 @@ from rest_framework import permissions, status, views
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserRegistrationSerializer, UserSerializer
+from django.contrib.auth import authenticate
 
 # Create your views here.
 
 def index(request):
+    print("Rendering index page")
     return render(request, 'dashboard/index.html')
 
 
@@ -36,4 +38,21 @@ class ObtainTokenPairView(views.APIView):
             })
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+
+def login_view(request):
+    print("Accessing login view")
+    return render(request, 'dashboard/login.html')
+
+def dashboard_view(request):
+    print("Accessing dashboard view")
+    if request.user.is_authenticated:
+        return render(request, 'dashboard/dashboard.html')
+    else:
+        return render(request, 'dashboard/login.html', {'error': 'You must be logged in to view the dashboard'})
+
+def upload_view(request):
+    if request.user.is_authenticated:
+        return render(request, 'dashboard/upload.html')
+    else:
+        return render(request, 'dashboard/login.html', {'error': 'You must be logged in to upload files'})
 
