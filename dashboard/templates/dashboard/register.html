@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduAssist - Login</title>
+    <title>EduAssist - Register</title>
     <style>
         * {
             margin: 0;
@@ -76,6 +76,23 @@
             text-align: center;
             margin-top: 10px;
         }
+        .success {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
         /* SVG Logo Styling */
         svg {
             width: 120px;
@@ -104,38 +121,93 @@
         -->
     </div>
 
-    <!-- Right Section: Login Form -->
+    <!-- Right Section: Registration Form -->
     <div class="right-section">
-        <h1>Login</h1>
-        <form id="loginForm" method="POST" action="/dashboard/login/">
+        <h1>Register</h1>
+        <form id="registerForm" method="POST" action="/dashboard/register/">
             {% csrf_token %}
             <label for="username">Username:</label>
             <input type="text" name="username" required>
 
+            <label for="email">Email:</label>
+            <input type="email" name="email" required>
+
             <label for="password">Password:</label>
             <input type="password" name="password" required>
 
-            <button type="submit" class="btn">Login</button>
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" required>
+
+            <button type="submit" class="btn">Register</button>
 
             {% if error %}
                 <p class="error">{{ error }}</p>
             {% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="success">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
         </form>
+
+        <!-- Already a user? Login link -->
+        <div class="login-link">
+            <p>Already a user? <a href="/dashboard/login/">Login</a></p>
+        </div>
     </div>
 </div>
 
 <script>
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
-        const username = document.getElementsByName("username")[0].value;
-        const password = document.getElementsByName("password")[0].value;
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        var password = document.getElementsByName("password")[0].value;
+        var confirmPassword = document.getElementsByName("confirm_password")[0].value;
 
-        if (!username || !password) {
+        if (password !== confirmPassword) {
             event.preventDefault();
-            alert("Username and Password are required!");
+            alert("Passwords do not match!");
         }
     });
 </script>
 
+</body>
+</html>
+
+
+
+
+
+
+
+
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h1>User Registration</h1>
+    <form method="POST" action="/dashboard/register/">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" name="username" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
 
 </body>
 </html>
+-->
+
+
