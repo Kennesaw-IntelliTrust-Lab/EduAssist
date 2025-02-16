@@ -13,6 +13,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from .models import Assignment, ClassNote, Syllabus
+from .forms import AssignmentForm, ClassNoteForm, SyllabusForm
 
 # Create your views here.
 
@@ -139,8 +141,69 @@ def user_dashboard(request, username):
 
     return render(request, 'dashboard/dashboard.html', {'user_data': user_data})
 
+
+@login_required
+def upload_assignment(request):
+    if request.method == "POST":
+        form = AssignmentForm(request.POST, request.FILES)
+        if form.is_valid():
+            assignment = form.save(commit=False)
+            assignment.teacher = request.user  # Assign the logged-in teacher
+            assignment.save()
+            return redirect('dashboard')  # Redirect to dashboard after upload
+    else:
+        form = AssignmentForm()
+    return render(request, 'dashboard/upload_assignment.html', {'form': form})
+
+# Upload Class Notes View
+@login_required
+def upload_class_note(request):
+    if request.method == "POST":
+        form = ClassNoteForm(request.POST, request.FILES)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.teacher = request.user  # Assign the logged-in teacher
+            note.save()
+            return redirect('dashboard')
+    else:
+        form = ClassNoteForm()
+    return render(request, 'dashboard/upload_class_note.html', {'form': form})
+
+# Upload Syllabus View
+@login_required
+def upload_syllabus(request):
+    if request.method == "POST":
+        form = SyllabusForm(request.POST, request.FILES)
+        if form.is_valid():
+            syllabus = form.save(commit=False)
+            syllabus.teacher = request.user
+            syllabus.save()
+            return redirect('dashboard')
+    else:
+        form = SyllabusForm()
+    return render(request, 'dashboard/upload_syllabus.html', {'form': form})
+
+# View Uploaded Assignments
+@login_required
+def view_assignments(request):
+    assignments = Assignment.objects.all()
+    return render(request, 'dashboard/view_assignments.html', {'assignments': assignments})
+
+# View Uploaded Notes
+@login_required
+def view_notes(request):
+    notes = ClassNote.objects.all()
+    return render(request, 'dashboard/view_notes.html', {'notes': notes})
+
+# View Uploaded Syllabus
+@login_required
+def view_syllabus(request):
+    syllabus_list = Syllabus.objects.all()
+    return render(request, 'dashboard/view_syllabus.html', {'syllabus_list': syllabus_list})
+    
 #View
 
+'''
 def upload_view(request):
     try:
         auth = JWTAuthentication()
@@ -148,7 +211,7 @@ def upload_view(request):
         return render(request, 'dashboard/upload.html')
     except AuthenticationFailed:
         return redirect('/dashboard/login/')
-
+'''
 
 #View
 

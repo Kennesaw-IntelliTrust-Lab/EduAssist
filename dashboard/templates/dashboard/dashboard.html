@@ -1,13 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
 </head>
 <body>
-    <h1>Welcome to the Dashboard</h1>
-    <p>You are logged in.</p>
-    <p>This is where you can manage all your work.</p>
-    <a href="/dashboard/logout/">Logout</a> <!-- Logout link -->
+    <h1>Welcome, {{ user.username }}!</h1>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'upload_assignment' %}">Upload Assignment</a></li>
+            <li><a href="{% url 'upload_class_note' %}">Upload Class Notes</a></li>
+            <li><a href="{% url 'upload_syllabus' %}">Upload Syllabus</a></li>
+            <li><a href="{% url 'view_assignments' %}">View Assignments</a></li>
+            <li><a href="{% url 'view_notes' %}">View Notes</a></li>
+            <li><a href="{% url 'view_syllabus' %}">View Syllabus</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <hr>
+
+    <div>
+        {% block content %}  
+        <p>This is your dashboard where you can manage assignments, class notes, and syllabus.</p>
+        {% endblock %}
+    </div>
+
 </body>
 </html>
-
