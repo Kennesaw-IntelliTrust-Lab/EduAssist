@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from google.cloud import storage
+from google.auth import default
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'Naqsa',
+        'PASSWORD': 'postgres', #Naqsa
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -113,6 +115,18 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+
+# Google Cloud Storage Settings
+credentials, project_id = default()  # Automatically detects ADC credentials
+
+GS_CREDENTIALS = credentials  # Use ADC credentials instead of a JSON key
+GS_BUCKET_NAME = "eduassist-storage"
+
+DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+GS_LOCATION = "uploads/"
+MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
 
 
 # Internationalization
