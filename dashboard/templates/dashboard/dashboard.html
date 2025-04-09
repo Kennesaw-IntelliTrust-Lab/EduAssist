@@ -50,9 +50,22 @@
             <i class="fas fa-list-ul me-2"></i>Syllabus
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#exams">
+            <i class="fas fa-file-alt me-2"></i>Exams
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#projects">
+            <i class="fas fa-project-diagram me-2"></i>Projects
+        </a>
+    </li>
 </ul>
 
+
 <!-- Tab Content -->
+
+<!-- "Assignments" Tab Content -->
 <div class="tab-content mt-4">
     <div class="tab-pane fade show active" id="assignments">
         <h3><i class="fas fa-tasks me-2"></i>Assignments</h3>
@@ -81,6 +94,7 @@
         {% endif %}
     </div>
     
+    <!-- "Class notes" Tab Content -->
     <div class="tab-pane fade" id="class_notes">
         <h3><i class="fas fa-book me-2"></i>Class Notes</h3>
         {% if not selected_course %}
@@ -108,6 +122,7 @@
         {% endif %}
     </div>
     
+    <!-- "Syllabus" Tab Content -->
     <div class="tab-pane fade" id="syllabus">
         <h3><i class="fas fa-list-ul me-2"></i>Syllabus</h3>
         {% if not selected_course %}
@@ -134,9 +149,65 @@
             </ul>
         {% endif %}
     </div>
+    
+    <!-- "Exams" Tab Content -->
+    <div class="tab-pane fade" id="exams">
+        <h3><i class="fas fa-file-alt me-2"></i>Exams</h3>
+        {% if not selected_course %}
+            <div class="alert alert-info">Please select or create a course to manage exams.</div>
+        {% else %}
+            <ul class="file-list">
+                {% for file in files %}
+                    {% if file.category == "exams" %}
+                        <li class="file-item">
+                            <i class="fas fa-file-alt file-icon"></i>
+                            <a href="{% url 'serve_file' file.id %}" target="_blank" class="file-link">{{ file.file.name }}</a>
+                            <!-- delete button -->
+                            <button class="btn btn-sm btn-danger delete-file" data-file-id="{{ file.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </li>
+                    {% endif %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fas fa-file-upload"></i>
+                        <p>No exams uploaded yet for {{ selected_course.name }}. Upload your exam files using the form below.</p>
+                    </div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <!-- "Projects" Tab Content -->
+    <div class="tab-pane fade" id="projects">
+        <h3><i class="fas fa-project-diagram me-2"></i>Projects</h3>
+        {% if not selected_course %}
+            <div class="alert alert-info">Please select or create a course to manage projects.</div>
+        {% else %}
+            <ul class="file-list">
+                {% for file in files %}
+                    {% if file.category == "projects" %}
+                        <li class="file-item">
+                            <i class="fas fa-file-alt file-icon"></i>
+                            <a href="{% url 'serve_file' file.id %}" target="_blank" class="file-link">{{ file.file.name }}</a>
+                            <!-- delete button -->
+                            <button class="btn btn-sm btn-danger delete-file" data-file-id="{{ file.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </li>
+                    {% endif %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fas fa-file-upload"></i>
+                        <p>No projects uploaded yet for {{ selected_course.name }}. Upload your project files using the form below.</p>
+                    </div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 </div>
 
-<!-- File Upload Form -->
+<!-- File Upload Form with Updated Categories -->
 <div class="upload-section">
     <h3><i class="fas fa-cloud-upload-alt me-2"></i>Upload a New File</h3>
     {% if not selected_course %}
@@ -160,6 +231,8 @@
                     <option value="assignments">Assignments</option>
                     <option value="class_notes">Class Notes</option>
                     <option value="syllabus">Syllabus</option>
+                    <option value="exams">Exams</option>
+                    <option value="projects">Projects</option>
                 </select>
             </div>
             <button type="submit" class="btn upload-btn">
@@ -169,7 +242,7 @@
     {% endif %}
 </div>
 
-<!-- Add Course Modal -->
+<!-- Added Course Modal -->
 <div class="modal fade" id="add-course-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

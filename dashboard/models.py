@@ -7,6 +7,8 @@ CATEGORY_CHOICES = [
     ("assignments", "Assignments"),
     ("class_notes", "Class Notes"),
     ("syllabus", "Syllabus"),
+    ("exams", "Exams"),
+    ("projects", "Projects"),
     ("chatbot_files", "Chatbot Files"),
 ]
 
