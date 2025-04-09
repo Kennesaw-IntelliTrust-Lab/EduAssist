@@ -480,29 +480,44 @@ def upload_chat_file(request):
             return JsonResponse({'error': 'No file provided'}, status=400)
         
         uploaded_file = request.FILES['file']
-
-        ## Debug
-        file_ext = os.path.splitext(uploaded_file.name)[1].lower()
-        if file_ext in ['.jpg', '.jpeg', '.png']:
-            print(f"Processing image file: {uploaded_file.name}")
+        
+        # Log detailed file info
+        file_name = uploaded_file.name
+        file_ext = os.path.splitext(file_name)[1].lower()
+        file_content_type = uploaded_file.content_type
+        file_size = uploaded_file.size
+        
+        logger.info(f"File upload attempt: name={file_name}, ext={file_ext}, type={file_content_type}, size={file_size}")
         
         # Check file size
-        if uploaded_file.size > MAX_FILE_SIZE:
+        if file_size > MAX_FILE_SIZE:
+            logger.warning(f"File size too large: {file_size} bytes > {MAX_FILE_SIZE} bytes")
             return JsonResponse({
                 'error': f'File size exceeds the maximum limit of 5MB'
             }, status=400)
         
         # Check file type
-        file_ext = os.path.splitext(uploaded_file.name)[1].lower()
         if file_ext not in ALLOWED_FILE_TYPES:
+            logger.warning(f"File type not allowed: {file_ext}")
             return JsonResponse({
                 'error': f'File type {file_ext} is not supported. Supported types: {", ".join(ALLOWED_FILE_TYPES.keys())}'
             }, status=400)
         
-        # Form processing
+        # Specifically handle PNG files
+        if file_ext == '.png':
+            logger.info(f"PNG file detected: {file_name}")
+            # Check if content type is incorrect
+            if not file_content_type.startswith('image/'):
+                logger.info(f"Fixing content type for PNG: {file_content_type} -> image/png")
+                # Force the correct content type for PNG files
+                uploaded_file.content_type = 'image/png'
+        
+        # Use a custom form for better validation
         form = FileUploadForm({'category': 'chatbot_files'}, {'file': uploaded_file})
         
+        # Check if form is valid
         if form.is_valid():
+            logger.info(f"Form is valid for file: {file_name}")
             file_obj = form.save(commit=False)
             file_obj.user = request.user
             file_obj.save()
@@ -512,17 +527,20 @@ def upload_chat_file(request):
             file_path = file_obj.file.name
             public_url = f"https://storage.googleapis.com/{bucket_name}/{file_path}"
             
-            return JsonResponse({
+            response_data = {
                 'file_id': file_obj.id,
                 'file_name': file_obj.file.name,
                 'file_url': public_url
-            })
+            }
+            logger.info(f"File uploaded successfully: {response_data}")
+            return JsonResponse(response_data)
         else:
-            return JsonResponse({'error': f'Invalid form data: {form.errors}'}, status=400)
+            logger.error(f"Form validation failed: {form.errors}")
+            return JsonResponse({'error': f'Form validation error: {form.errors}'}, status=400)
     
     except Exception as e:
-        logger.error(f"Error uploading chat file: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=500)
+        logger.error(f"Exception in upload_chat_file: {str(e)}", exc_info=True)
+        return JsonResponse({'error': f'Error processing file: {str(e)}'}, status=500)
 
 
 # ChatBot API

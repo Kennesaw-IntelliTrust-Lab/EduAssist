@@ -213,113 +213,129 @@ if (saveCourseBtn) {
     }
 
     // Function to handle file upload for chat
-    function uploadChatFile() {
-        const files = chatFileInput.files;
-        const errorElement = document.getElementById('file-upload-error');
-        
-        // Reset error message
-        if (errorElement) {
-            errorElement.style.display = 'none';
-            errorElement.textContent = '';
-        }
-        
-        if (files.length === 0) {
-            return;
-        }
-        
-        const file = files[0];
-        
-        // Check file type (same as server-side check)
-        const allowedTypes = ['.txt', '.csv', '.md', '.pdf', '.docx', '.xlsx', '.pptx', '.jpg', '.jpeg', '.png'];
-        const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-        
-        // In your uploadChatFile function, add this logging
-        console.log("File type check:", fileExt, allowedTypes.includes(fileExt));
-        
-        if (!allowedTypes.includes(fileExt)) {
-            if (['.jpg', '.jpeg', '.png'].includes(fileExt)) {
-                console.log("This is an image file, trying to upload anyway");
-            } else {
-                if (errorElement) {
-                    errorElement.textContent = `File type ${fileExt} is not supported. Supported types: ${allowedTypes.join(', ')}`;
-                    errorElement.style.display = 'block';
-                }
-                chatFileInput.value = '';
-                return;
-            }
-        }
-        
-        // Check file size (5MB)
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (file.size > maxSize) {
-            if (errorElement) {
-                errorElement.textContent = 'File size exceeds the maximum limit of 5MB';
-                errorElement.style.display = 'block';
-            }
-            chatFileInput.value = '';
-            return;
-        }
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Show loading indicator
-        const loadingEl = document.createElement('div');
-        loadingEl.className = 'selected-file';
-        loadingEl.innerHTML = `<span>${file.name} (Uploading...)</span>`;
-        const selectedFilesEl = document.getElementById('selected-chat-files');
-        if (selectedFilesEl) {
-            selectedFilesEl.appendChild(loadingEl);
-        }
-        
-        fetch('/api/upload-chat-file/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCSRFToken()
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Remove loading indicator
-            if (selectedFilesEl && loadingEl) {
-                selectedFilesEl.removeChild(loadingEl);
-            }
-            
-            if (data.error) {
-                if (errorElement) {
-                    errorElement.textContent = data.error;
-                    errorElement.style.display = 'block';
-                }
-                return;
-            }
-            
-            // Add file to selected files array
-            window.selectedChatFiles.push({
-                id: data.file_id,
-                name: data.file_name
-            });
-            
-            // Display selected file in UI
-            displaySelectedChatFiles();
-            
-            // Clear file input
-            chatFileInput.value = '';
-        })
-        .catch(error => {
-            // Remove loading indicator
-            if (selectedFilesEl && loadingEl) {
-                selectedFilesEl.removeChild(loadingEl);
-            }
-            
-            if (errorElement) {
-                errorElement.textContent = 'Error uploading file. Please try again.';
-                errorElement.style.display = 'block';
-            }
-            console.error('Error uploading file:', error);
-            chatFileInput.value = '';
-        });
+// Fixed uploadChatFile function with improved image handling
+function uploadChatFile() {
+    const files = chatFileInput.files;
+    const errorElement = document.getElementById('file-upload-error');
+    
+    // Reset error message
+    if (errorElement) {
+        errorElement.style.display = 'none';
+        errorElement.textContent = '';
     }
+    
+    if (files.length === 0) {
+        return;
+    }
+    
+    const file = files[0];
+    
+    // Check file type (same as server-side check)
+    const allowedTypes = ['.txt', '.csv', '.md', '.pdf', '.docx', '.xlsx', '.pptx', '.jpg', '.jpeg', '.png'];
+    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    // Log file information for debugging
+    console.log("File upload attempt:", {
+        name: file.name,
+        extension: fileExt,
+        type: file.type,
+        size: file.size
+    });
+    
+    // Fixed logic for file type checking
+    if (!allowedTypes.includes(fileExt)) {
+        if (errorElement) {
+            errorElement.textContent = `File type ${fileExt} is not supported. Supported types: ${allowedTypes.join(', ')}`;
+            errorElement.style.display = 'block';
+        }
+        chatFileInput.value = '';
+        return;
+    }
+    
+    // Special handling for image files - now outside the previous check
+    if (['.jpg', '.jpeg', '.png'].includes(fileExt)) {
+        console.log("Processing image file:", file.name, file.type);
+    }
+    
+    // Check file size (5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        if (errorElement) {
+            errorElement.textContent = 'File size exceeds the maximum limit of 5MB';
+            errorElement.style.display = 'block';
+        }
+        chatFileInput.value = '';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Show loading indicator
+    const loadingEl = document.createElement('div');
+    loadingEl.className = 'selected-file';
+    loadingEl.innerHTML = `<span>${file.name} (Uploading...)</span>`;
+    const selectedFilesEl = document.getElementById('selected-chat-files');
+    if (selectedFilesEl) {
+        selectedFilesEl.appendChild(loadingEl);
+    }
+    
+    fetch('/api/upload-chat-file/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: formData
+    })
+    .then(response => {
+        // Log raw response for debugging
+        console.log("File upload response status:", response.status);
+        return response.json();
+    })
+    .then(data => {
+        // Remove loading indicator
+        if (selectedFilesEl && loadingEl) {
+            selectedFilesEl.removeChild(loadingEl);
+        }
+        
+        // Log response data for debugging
+        console.log("File upload response data:", data);
+        
+        if (data.error) {
+            if (errorElement) {
+                errorElement.textContent = data.error;
+                errorElement.style.display = 'block';
+            }
+            return;
+        }
+        
+        // Add file to selected files array
+        window.selectedChatFiles.push({
+            id: data.file_id,
+            name: data.file_name
+        });
+        
+        // Display selected file in UI
+        displaySelectedChatFiles();
+        
+        // Clear file input
+        chatFileInput.value = '';
+    })
+    .catch(error => {
+        // Remove loading indicator
+        if (selectedFilesEl && loadingEl) {
+            selectedFilesEl.removeChild(loadingEl);
+        }
+        
+        console.error('Error uploading file:', error);
+        
+        if (errorElement) {
+            errorElement.textContent = 'Error uploading file. Please try again.';
+            errorElement.style.display = 'block';
+        }
+        chatFileInput.value = '';
+    });
+}
 
     // Function to display selected files in the chat UI
     function displaySelectedChatFiles() {
