@@ -1,0 +1,14 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Welcome to EduAssist{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="mb-4">Welcome to EduAssist</h1>
+    <p>Your platform for managing course materials efficiently.</p>
+    <div class="mt-4">
+        <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
+    </div>
+</div>
+{% endblock %}
