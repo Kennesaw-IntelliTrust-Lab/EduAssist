@@ -4,6 +4,7 @@
 
 EduAssist is a cloud-based app for teachers and professors that combines file organization with an AI assistant. It helps educators keep all their teaching materials in one place while providing AI support for common teaching tasks.
 The app lets you create separate spaces for each course you teach, where you can store and organize assignments, rubrics, notes, and syllabi. This makes it easy to find what you need when you need it, without digging through scattered files or folders.
+
 What makes EduAssist special is its AI assistant that helps with everyday teaching tasks like creating syllabi, generating questions for tests, creating rubric, etc.
 
 EduAssist runs on Google Cloud and uses Groq's AI technology, making it fast and reliable. The app is designed to be straightforward to use, so you don't need to be tech-savvy to benefit from its AI features.
