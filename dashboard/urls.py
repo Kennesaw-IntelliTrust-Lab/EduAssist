@@ -31,6 +31,9 @@ urlpatterns = [
 
     # chat file uploads
     path('api/upload-chat-file/', views.upload_chat_file, name='upload_chat_file'),
+    
+    # generated files by chatbot
+    path('api/generate-file/', views.generate_file, name='generate_file'),
 
 ]
 
